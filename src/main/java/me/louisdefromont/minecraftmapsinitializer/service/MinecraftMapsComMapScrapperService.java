@@ -3,25 +3,33 @@ package me.louisdefromont.minecraftmapsinitializer.service;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import me.louisdefromont.minecraftmapsinitializer.MapCategory;
 import me.louisdefromont.minecraftmapsinitializer.MinecraftMap;
 import me.louisdefromont.minecraftmapsinitializer.MinecraftVersion;
+import me.louisdefromont.minecraftmapsinitializer.MinecraftVersionRepository;
 import me.louisdefromont.minecraftmapsinitializer.PlayerCount;
 import me.louisdefromont.minecraftmapsinitializer.TextTools;
+import me.louisdefromont.minecraftmapsinitializer.controller.MinecraftVersionController;
 
 @Service
 public class MinecraftMapsComMapScrapperService {
+    @Autowired
+    private MinecraftVersionRepository minecraftVersionRepository;
+
+    @Autowired
+    private MinecraftVersionController minecraftVersionController;
+
     @Async
     public CompletableFuture<MinecraftMap> scrapeMap(MinecraftMap minecraftMap) {
         CompletableFuture<MinecraftMap> minecraftMapThread = scrapeMap(minecraftMap.getSourceURL());
@@ -69,8 +77,14 @@ public class MinecraftMapsComMapScrapperService {
 
         Elements statsDataTableRows = document.select(".stats_data table").get(1).select("tr");
 
-        MinecraftVersion minecraftVersion = MinecraftVersion.getMinecraftVersion(statsDataTableRows.get(3).select("td").get(1).text());
-        minecraftMap.setMinecraftVersion(minecraftVersion);
+        String minecraftVersionString = statsDataTableRows.get(3).select("td").get(1).text();
+        Optional<MinecraftVersion> minecraftVersion = minecraftVersionRepository.findByVersion(minecraftVersionString);
+        if (! minecraftVersion.isPresent()) {
+            minecraftVersionController.addNewVersion(minecraftVersionString);
+            minecraftVersion = minecraftVersionRepository.findByVersion(minecraftVersionString);
+        }
+
+        minecraftMap.setMinecraftVersion(minecraftVersion.get());
 
         try {
             MapCategory mapCategory = MapCategory.valueOf(statsDataTableRows.get(7).select("td").get(1).text().replace(" Maps", ""));

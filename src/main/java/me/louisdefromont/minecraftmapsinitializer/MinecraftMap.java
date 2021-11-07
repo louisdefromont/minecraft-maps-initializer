@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -36,7 +37,7 @@ public class MinecraftMap {
     private String sourceURL;
     private String mapFileURL;
     private String resourcePackURL;
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
     private MinecraftVersion minecraftVersion;
     @Enumerated(EnumType.STRING)
     private MapCategory category;
