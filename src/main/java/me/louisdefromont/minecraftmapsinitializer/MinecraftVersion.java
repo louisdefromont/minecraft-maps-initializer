@@ -19,6 +19,7 @@ public class MinecraftVersion {
     private Long id;
     private String version;
     private String mcVersionNetDownloadLink;
+    private String optifineNetDownloadLink;
 
     @Override
     public boolean equals(Object object) {

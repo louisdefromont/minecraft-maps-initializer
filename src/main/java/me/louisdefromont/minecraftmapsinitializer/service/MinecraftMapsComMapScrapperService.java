@@ -46,6 +46,8 @@ public class MinecraftMapsComMapScrapperService {
             return null;
         }
 
+        // System.out.println("Scrapping from: " + url);
+
         Document document;
         try {
             document = Jsoup.connect(url).get();
@@ -80,11 +82,10 @@ public class MinecraftMapsComMapScrapperService {
         String minecraftVersionString = statsDataTableRows.get(3).select("td").get(1).text();
         Optional<MinecraftVersion> minecraftVersion = minecraftVersionRepository.findByVersion(minecraftVersionString);
         if (! minecraftVersion.isPresent()) {
-            minecraftVersionController.addNewVersion(minecraftVersionString);
-            minecraftVersion = minecraftVersionRepository.findByVersion(minecraftVersionString);
+            minecraftMap.setMinecraftVersion(minecraftVersionController.addNewVersion(minecraftVersionString));
+        } else {
+            minecraftMap.setMinecraftVersion(minecraftVersion.get());
         }
-
-        minecraftMap.setMinecraftVersion(minecraftVersion.get());
 
         try {
             MapCategory mapCategory = MapCategory.valueOf(statsDataTableRows.get(7).select("td").get(1).text().replace(" Maps", ""));

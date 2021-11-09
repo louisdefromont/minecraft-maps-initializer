@@ -24,10 +24,10 @@ public class ScraperController {
         minecraftMapsComScraper.scrapeNewestMaps(pages);
     }
 
-    @PostMapping(path = "/minecraftMaps/new/{pages}/smart")
-    public void saveNewestMinecraftMapsComSmart(@PathVariable int pages) {
-        minecraftMapsComScraper.scrapeNewestMapsSmart(pages, 15);
-    }
+    // @PostMapping(path = "/minecraftMaps/new/{pages}/smart")
+    // public void saveNewestMinecraftMapsComSmart(@PathVariable int pages) {
+    //     minecraftMapsComScraper.scrapeNewestMapsSmart(pages, 15);
+    // }
 
     @PostMapping(path = "/minecraftMaps/update")
     public void updateMinecraftMapsCom() {
